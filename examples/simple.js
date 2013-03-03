@@ -10,6 +10,8 @@ var main = lift2(frameRates, position, function display(frameRate, pos) {
         Text(frameRate)
         , Text("[x=" + pos.x + ", y=" + pos.y + "]")
         , Form({ x: pos.x + 20, y: pos.y + 20 }, Text(frameRate))
+        //, Form({ x: pos.x , y: pos.y }, Rect({ fill: "red" })) - what it's supposed to be
+        , Rect({ x: pos.x , y: pos.y , fill: "red" })// need to fix issue on line 70
     ])
 })
 
@@ -51,6 +53,21 @@ function render(input) {
             })
 
             surface.appendChild(container)
+        } else if (type === "Rect") {
+            var oldSvg = document.getElementById("mysvg")        
+            var params = x[1]     
+            var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+            var svgEl = document.createElementNS("http://www.w3.org/2000/svg", "rect")
+            oldSvg && oldSvg.parentNode && oldSvg.parentNode.removeChild(oldSvg)
+            svgEl.height.baseVal.value = params.height || 30
+            svgEl.width.baseVal.value = params.width || 30
+            svgEl.style.fill= params.fill || "blue"
+            svgEl.x.baseVal.value = params.x
+            svgEl.y.baseVal.value = params.y
+            svg.appendChild(svgEl)  
+            svg.id = "mysvg"
+            document.body.appendChild(svg)
+            //surface.appendChild(svg) - can't get this working
         }
     }
 }
@@ -64,6 +81,8 @@ function Form(pos, shape) {
 }
 
 function Text(str) { return ["Text", str] }
+
+function Rect(params) { return ["Rect", params] }
 
 function MousePosition() {
     return signal(function (send) {

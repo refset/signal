@@ -11,7 +11,7 @@ var main = lift2(frameRates, position, function display(frameRate, pos) {
         , Text("[x=" + pos.x + ", y=" + pos.y + "]")
         , Form({ x: pos.x + 20, y: pos.y + 20 }, Text(frameRate))
         //, Form({ x: pos.x , y: pos.y }, Rect({ fill: "red" })) - what it's supposed to be
-        , Rect({ x: pos.x , y: pos.y , fill: "red" })// need to fix issue on line 70
+        , Rect({ id:"redOne" , x: pos.x , y: pos.y , fill: "red" , width: pos.x/3, height: pos.y/3 })// have to make do with this for now
     ])
 })
 
@@ -54,20 +54,25 @@ function render(input) {
 
             surface.appendChild(container)
         } else if (type === "Rect") {
-            var oldSvg = document.getElementById("mysvg")        
             var params = x[1]     
-            var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-            var svgEl = document.createElementNS("http://www.w3.org/2000/svg", "rect")
-            oldSvg && oldSvg.parentNode && oldSvg.parentNode.removeChild(oldSvg)
+            var oldSvg = document.getElementById(params.id)        
+            
+            if(!params.id || !oldSvg)
+            {
+              oldSvg && oldSvg.parentNode && oldSvg.parentNode.removeChild(oldSvg)
+              var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+              var svgEl = document.createElementNS("http://www.w3.org/2000/svg", "rect")
+              document.body.appendChild(svg)
+              //surface.appendChild(svg) - can't get this working
+              svg.appendChild(svgEl)
+              svg.id = params.id
+            }
+            else  svgEl = oldSvg.lastChild
             svgEl.height.baseVal.value = params.height || 30
             svgEl.width.baseVal.value = params.width || 30
             svgEl.style.fill= params.fill || "blue"
             svgEl.x.baseVal.value = params.x
             svgEl.y.baseVal.value = params.y
-            svg.appendChild(svgEl)  
-            svg.id = "mysvg"
-            document.body.appendChild(svg)
-            //surface.appendChild(svg) - can't get this working
         }
     }
 }
